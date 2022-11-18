@@ -3,9 +3,13 @@ package com.fenquen.jfsnotify;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class FsNotify  {
+public class FsNotify {
     static {
-        System.loadLibrary("jfsnotify");
+        try {
+            System.load(LibraryLoader.copyLibraryToTemp().getAbsolutePath());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private BlockingQueue<Event> eventQueue;
@@ -52,16 +56,16 @@ public class FsNotify  {
 
 
         //while (true) {
-            Event event = fsNotify.getQueue().take();
-            System.out.println(event.type);
-            System.out.println(event.fd);
-            System.out.println(event.fdPath);
-            System.out.println(event.pid);
-            System.out.println(event.pidPath);
+        Event event = fsNotify.getQueue().take();
+        System.out.println(event.type);
+        System.out.println(event.fd);
+        System.out.println(event.fdPath);
+        System.out.println(event.pid);
+        System.out.println(event.pidPath);
 
-            System.out.println();
+        System.out.println();
 
-       // }
+        // }
 
         fsNotify.stopWatch();
     }

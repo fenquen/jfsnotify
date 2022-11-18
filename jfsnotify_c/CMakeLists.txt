@@ -9,3 +9,6 @@ include_directories(${JAVA_HOME}/include ${JAVA_HOME}/include/linux)
 link_directories(${JAVA_HOME}/jre/lib/amd64)
 
 add_library(jfsnotify SHARED fsnotify.cpp common.cpp)
+set(CMAKE_INSTALL_PREFIX ../../jfsnotify_java/src/main/resources)
+
+install(TARGETS jfsnotify DESTINATION .)
