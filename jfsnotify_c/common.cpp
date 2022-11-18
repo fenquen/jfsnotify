@@ -23,7 +23,7 @@ char *pid2Path(int pid, char *string, size_t stringLen) {
 
     /* Read file contents into string */
     ssize_t len;
-    if ((len = read(fd, string, stringLen - 1)) <= 0) {
+    if ((len = read(fd, string, stringLen - 1)) == -1) {
         close(fd);
         return nullptr;
     }
@@ -41,13 +41,13 @@ char *pid2Path(int pid, char *string, size_t stringLen) {
 }
 
 char *fd2Path(int fd, char *string, size_t strLen) {
-    ssize_t len;
-
     if (fd <= 0) {
         return nullptr;
     }
 
     sprintf(string, "/proc/self/fd/%d", fd);
+
+    ssize_t len;
     if ((len = readlink(string, string, strLen - 1)) < 0) {
         return nullptr;
     }
