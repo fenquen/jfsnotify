@@ -31,20 +31,24 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
     jclass queueClass = env->FindClass(QUEUE_CLASS);
     if (queueClass == nullptr) {
         THROW_PLAIN(env, "queueClass == nullptr");
+        return;
     }
     jmethodID addMethod = env->GetMethodID(queueClass, "add", "(Ljava/lang/Object;)Z");
     if (addMethod == nullptr) {
         THROW_PLAIN(env, "addMethod == nullptr");
+        return;
     }
 
     // event
     jclass eventClass = env->FindClass(EVENT_CLASS);
     if (eventClass == nullptr) {
         THROW_PLAIN(env, "eventClass == nullptr");
+        return;
     }
     jmethodID envConstructMethod = env->GetMethodID(eventClass, INIT, "()V");
     if (envConstructMethod == nullptr) {
         THROW_PLAIN(env, "envConstructMethod == nullptr");
+        return;
     }
 
     jfieldID typeFiled = env->GetFieldID(eventClass, "type", "I");
@@ -54,8 +58,9 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
     jfieldID pidPathField = env->GetFieldID(eventClass, "pidPath", "Ljava/lang/String;");
 
     int fanotifyFd = fanotify_init(FAN_CLASS_NOTIF, O_RDWR);
-    if (fanotifyFd == FAIL) {
+    if (fanotifyFd == FAIL_CODE) {
         THROW(env, "%s%s", "fanotify_init fail,reason:", strerror(errno));
+        return;
     }
     int ret = fanotify_mark(fanotifyFd,
                             FAN_MARK_ADD,
@@ -64,12 +69,14 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
                             env->GetStringUTFChars(targetPath, nullptr));
     if (ret == -1) {
         THROW(env, "%s%s", "fanotify_mark fail,reason:", strerror(errno));
+        return;
     }
 
     int socketPairs[2];
     ret = socketpair(AF_UNIX, SOCK_STREAM, 0, socketPairs);
-    if (ret == -1) {
+    if (ret == FAIL_CODE) {
         THROW(env, "%s%s", "socketpair fail ,reason:", strerror(errno));
+        return;
     }
     fd = socketPairs[0];
 
@@ -84,7 +91,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
     char pidPath[PATH_MAX];
 
     for (;;) {
-        if (poll(fds, 2, -1) < 0) {
+        if (poll(fds, 2, -1) == FAIL_CODE) {
             THROW(env, "%s%s", "poll() return -1,reason:", strerror(errno));
             break;
         }
