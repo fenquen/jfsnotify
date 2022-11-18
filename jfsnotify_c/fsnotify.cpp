@@ -12,7 +12,7 @@
 #include "com_fenquen_jfsnotify_FsNotify.h"
 #include "common.h"
 
-static int fd = -1;
+static int fd = INVALID_FD;
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,10 +90,20 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
     char fdPath[PATH_MAX];
     char pidPath[PATH_MAX];
 
+    bool needClose = false;
     for (;;) {
+        if (needClose) {
+            break;
+        }
+
         if (poll(fds, 2, -1) == FAIL_CODE) {
             THROW(env, "%s%s", "poll() return -1,reason:", strerror(errno));
             break;
+        }
+
+        // get the close signal
+        if (fds[1].revents & POLLIN) {
+            needClose = true;
         }
 
         if (fds[0].revents & POLLIN) {
@@ -146,6 +156,18 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
 
     close(fanotifyFd);
 }
+
+JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0(JNIEnv *env, jobject) {
+    if (fd == INVALID_FD) {
+        return;
+    }
+
+    if (write(fd, "close", 6) == FAIL_CODE) {
+        THROW(env, "%s%s", "write fail,reason:", strerror(errno));
+        return;
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -21,5 +21,6 @@ extern char *pid2Path(int pid, char *string, size_t stringLen);
 extern char *fd2Path(int fd, char *string, size_t strLen);
 
 #define FAIL_CODE (-1)
+#define INVALID_FD (-1)
 
 #endif //JFSNOTIFY_C_COMMON_H
