@@ -14,6 +14,10 @@ void throwException(JNIEnv *env, const char *message) {
 
 
 char *pid2Path(int pid, char *string, size_t stringLen) {
+    if (pid < 0) {
+        return nullptr;
+    }
+
     sprintf(string, "/proc/%d/cmdline", pid);
 
     int fd;

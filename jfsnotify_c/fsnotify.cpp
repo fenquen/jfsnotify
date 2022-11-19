@@ -21,12 +21,27 @@ extern "C" {
 /*
  * Class:     com_fenquen_jfsnotify_FsNotifier
  * Method:    watch0
- * Signature: (Ljava/util/concurrent/LinkedBlockingQueue;Ljava/lang/String;)V
+ * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
-                                                                  jobject thiz,
-                                                                  jobject eventQueue,
-                                                                  jstring targetPath) {
+JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, jobject thiz) {
+    jclass fsnotifyClass = env->GetObjectClass(thiz);
+
+    // eventQueue
+    jfieldID eventQueueField = env->GetFieldID(fsnotifyClass, "eventQueue", "Ljava/util/concurrent/BlockingQueue;");
+    if (eventQueueField == nullptr) {
+        THROW_PLAIN(env, "eventQueueField == nullptr");
+        return;
+    }
+    jobject eventQueue = env->GetObjectField(thiz, eventQueueField);
+
+    // targetPath
+    jfieldID targetPathField = env->GetFieldID(fsnotifyClass, "targetPath", "Ljava/lang/String;");
+    if (targetPathField == nullptr) {
+        THROW_PLAIN(env, "targetPathField == nullptr");
+        return;
+    }
+    jobject targetPath = env->GetObjectField(thiz, targetPathField);
+
     // queue
     jclass queueClass = env->FindClass(QUEUE_CLASS);
     if (queueClass == nullptr) {
@@ -51,7 +66,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
         return;
     }
 
-    jfieldID typeFiled = env->GetFieldID(eventClass, "type", "I");
+    jfieldID typeField = env->GetFieldID(eventClass, "type", "I");
     jfieldID fdField = env->GetFieldID(eventClass, "fd", "I");
     jfieldID fdPathField = env->GetFieldID(eventClass, "fdPath", "Ljava/lang/String;");
     jfieldID pidField = env->GetFieldID(eventClass, "pid", "I");
@@ -66,7 +81,8 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
                             FAN_MARK_ADD,
                             FAN_CLOSE | FAN_OPEN | FAN_EVENT_ON_CHILD,
                             0,
-                            env->GetStringUTFChars(targetPath, nullptr));
+                            env->GetStringUTFChars((jstring) targetPath,
+                                                   nullptr));// env->GetStringUTFChars(targetPath, nullptr)
     if (ret == -1) {
         THROW(env, "%s%s", "fanotify_mark fail,reason:", strerror(errno));
         return;
@@ -135,7 +151,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
                     // Event event = new Event();
                     jobject event = env->NewObject(eventClass, envConstructMethod);
 
-                    env->SetIntField(event, typeFiled, jint(eventMetadata->mask));
+                    env->SetIntField(event, typeField, jint(eventMetadata->mask));
                     env->SetIntField(event, fdField, eventMetadata->fd);
                     env->SetObjectField(event, fdPathField, env->NewStringUTF(fdPath0));
                     env->SetIntField(event, pidField, jint(eventMetadata->pid));
@@ -157,6 +173,11 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env,
     close(fanotifyFd);
 }
 
+/*
+ * Class:     com_fenquen_jfsnotify_FsNotify
+ * Method:    stopWatch0
+ * Signature: ()V
+ */
 JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0(JNIEnv *env, jobject) {
     if (fd == INVALID_FD) {
         return;

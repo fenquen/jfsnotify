@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_fenquen_jfsnotify_FsNotify
  * Method:    watch0
- * Signature: (Ljava/util/concurrent/BlockingQueue;Ljava/lang/String;)V
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0
-  (JNIEnv *, jobject, jobject, jstring);
+  (JNIEnv *, jobject);
 
 /*
  * Class:     com_fenquen_jfsnotify_FsNotify

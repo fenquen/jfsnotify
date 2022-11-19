@@ -26,10 +26,10 @@ public class FsNotify {
     }
 
     public void watch() throws Exception {
-        watch0(eventQueue, targetPath);
+        watch0();
     }
 
-    private native void watch0(BlockingQueue<Event> eventQueue, String targetPath) throws Exception;
+    private native void watch0() throws Exception;
 
     public void stopWatch() throws Exception {
         stopWatch0();
@@ -42,7 +42,7 @@ public class FsNotify {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(System.getProperty("java.library.path"));
+        //System.out.println(System.getProperty("java.library.path"));
         FsNotify fsNotify = new FsNotify("/home/a/fsnotify");
 
         new Thread(() -> {
