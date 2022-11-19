@@ -108,9 +108,9 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
     char fdPath[PATH_MAX];
     char pidPath[PATH_MAX];
 
-    bool needClose = false;
+    bool needstop = false;
     for (;;) {
-        if (needClose) {
+        if (needstop) {
             break;
         }
 
@@ -121,7 +121,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
 
         // get the close signal
         if (fds[1].revents & POLLIN) {
-            needClose = true;
+            needstop = true;
         }
 
         if (fds[0].revents & POLLIN) {
