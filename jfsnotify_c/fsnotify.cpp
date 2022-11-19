@@ -24,10 +24,11 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, jobject thiz) {
-    jclass fsnotifyClass = env->GetObjectClass(thiz);
+    static jclass fsnotifyClass = env->GetObjectClass(thiz);
 
     // eventQueue
-    jfieldID eventQueueField = env->GetFieldID(fsnotifyClass, "eventQueue", "Ljava/util/concurrent/BlockingQueue;");
+    static jfieldID eventQueueField = env->GetFieldID(fsnotifyClass, "eventQueue",
+                                                      "Ljava/util/concurrent/BlockingQueue;");
     if (eventQueueField == nullptr) {
         THROW_PLAIN(env, "eventQueueField == nullptr");
         return;
@@ -35,7 +36,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
     jobject eventQueue = env->GetObjectField(thiz, eventQueueField);
 
     // targetPath
-    jfieldID targetPathField = env->GetFieldID(fsnotifyClass, "targetPath", "Ljava/lang/String;");
+    static jfieldID targetPathField = env->GetFieldID(fsnotifyClass, "targetPath", "Ljava/lang/String;");
     if (targetPathField == nullptr) {
         THROW_PLAIN(env, "targetPathField == nullptr");
         return;
@@ -43,46 +44,47 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
     jobject targetPath = env->GetObjectField(thiz, targetPathField);
 
     // queue
-    jclass queueClass = env->FindClass(QUEUE_CLASS);
+    static jclass queueClass = env->FindClass(QUEUE_CLASS);
     if (queueClass == nullptr) {
         THROW_PLAIN(env, "queueClass == nullptr");
         return;
     }
-    jmethodID addMethod = env->GetMethodID(queueClass, "add", "(Ljava/lang/Object;)Z");
+    static jmethodID addMethod = env->GetMethodID(queueClass, "add", "(Ljava/lang/Object;)Z");
     if (addMethod == nullptr) {
         THROW_PLAIN(env, "addMethod == nullptr");
         return;
     }
 
     // event
-    jclass eventClass = env->FindClass(EVENT_CLASS);
+    static jclass eventClass = env->FindClass(EVENT_CLASS);
     if (eventClass == nullptr) {
         THROW_PLAIN(env, "eventClass == nullptr");
         return;
     }
-    jmethodID envConstructMethod = env->GetMethodID(eventClass, INIT, "()V");
+    static jmethodID envConstructMethod = env->GetMethodID(eventClass, INIT, "()V");
     if (envConstructMethod == nullptr) {
         THROW_PLAIN(env, "envConstructMethod == nullptr");
         return;
     }
 
-    jfieldID typeField = env->GetFieldID(eventClass, "type", "I");
-    jfieldID fdField = env->GetFieldID(eventClass, "fd", "I");
-    jfieldID fdPathField = env->GetFieldID(eventClass, "fdPath", "Ljava/lang/String;");
-    jfieldID pidField = env->GetFieldID(eventClass, "pid", "I");
-    jfieldID pidPathField = env->GetFieldID(eventClass, "pidPath", "Ljava/lang/String;");
+    static jfieldID typeField = env->GetFieldID(eventClass, "type", "I");
+    static jfieldID fdField = env->GetFieldID(eventClass, "fd", "I");
+    static jfieldID fdPathField = env->GetFieldID(eventClass, "fdPath", "Ljava/lang/String;");
+    static jfieldID pidField = env->GetFieldID(eventClass, "pid", "I");
+    static jfieldID pidPathField = env->GetFieldID(eventClass, "pidPath", "Ljava/lang/String;");
 
     int fanotifyFd = fanotify_init(FAN_CLASS_NOTIF, O_RDWR);
     if (fanotifyFd == FAIL_CODE) {
         THROW(env, "%s%s", "fanotify_init fail,reason:", strerror(errno));
         return;
     }
+    const char *cstr = env->GetStringUTFChars((jstring) targetPath, nullptr);
     int ret = fanotify_mark(fanotifyFd,
                             FAN_MARK_ADD,
                             FAN_CLOSE | FAN_OPEN | FAN_EVENT_ON_CHILD,
                             0,
-                            env->GetStringUTFChars((jstring) targetPath,
-                                                   nullptr));// env->GetStringUTFChars(targetPath, nullptr)
+                            cstr);
+    env->ReleaseStringUTFChars((jstring) targetPath, cstr);
     if (ret == -1) {
         THROW(env, "%s%s", "fanotify_mark fail,reason:", strerror(errno));
         return;
