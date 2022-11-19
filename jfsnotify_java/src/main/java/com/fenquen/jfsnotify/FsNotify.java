@@ -1,5 +1,6 @@
 package com.fenquen.jfsnotify;
 
+import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,8 +17,14 @@ public class FsNotify {
     private String targetPath;
 
     public FsNotify(BlockingQueue<Event> eventQueue, String targetPath) {
+        File file =  new File(targetPath);
+        if (file.isDirectory()){
+            
+        }
+
         this.eventQueue = eventQueue;
         this.targetPath = targetPath;
+
     }
 
     public FsNotify(String targetPath) {
