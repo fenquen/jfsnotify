@@ -17,6 +17,7 @@ public class FsNotify {
     private BlockingQueue<Event> eventQueue;
     private String targetPath;
 
+    // socket pair
     private int closeFd = -1;
 
 

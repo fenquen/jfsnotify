@@ -183,7 +183,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
 JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0(JNIEnv *env, jobject thiz) {
     static jclass fsnotifyClass = env->GetObjectClass(thiz);
     static jfieldID closeFdField = env->GetFieldID(fsnotifyClass, "closeFd", "I");
-    
+
     jint closeFd = env->GetIntField(thiz, closeFdField);
     if (closeFd == INVALID_FD) {
         return;
