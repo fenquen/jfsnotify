@@ -12,8 +12,6 @@
 #include "com_fenquen_jfsnotify_FsNotify.h"
 #include "common.h"
 
-static int fd = INVALID_FD;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -97,7 +95,8 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
         THROW(env, "%s%s", "socketpair fail ,reason:", strerror(errno));
         return;
     }
-    fd = socketPairs[0];
+    static jfieldID closeFdField = env->GetFieldID(fsnotifyClass, "closeFd", "I");
+    env->SetIntField(thiz, closeFdField, socketPairs[0]);
 
     struct pollfd fds[2];
     fds[0].fd = fanotifyFd;
@@ -181,12 +180,16 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
  * Method:    stopWatch0
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0(JNIEnv *env, jobject) {
-    if (fd == INVALID_FD) {
+JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0(JNIEnv *env, jobject thiz) {
+    static jclass fsnotifyClass = env->GetObjectClass(thiz);
+    static jfieldID closeFdField = env->GetFieldID(fsnotifyClass, "closeFd", "I");
+    
+    jint closeFd = env->GetIntField(thiz, closeFdField);
+    if (closeFd == INVALID_FD) {
         return;
     }
 
-    if (write(fd, "close", 6) == FAIL_CODE) {
+    if (write(closeFd, "close", 6) == FAIL_CODE) {
         THROW(env, "%s%s", "write fail,reason:", strerror(errno));
         return;
     }

@@ -17,6 +17,8 @@ public class FsNotify {
     private BlockingQueue<Event> eventQueue;
     private String targetPath;
 
+    private int closeFd = -1;
+
 
     public FsNotify(String targetPath, BlockingQueue<Event> eventQueue) throws FileNotFoundException {
         this.targetPath = targetPath;
