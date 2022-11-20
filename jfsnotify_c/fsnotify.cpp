@@ -79,6 +79,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
         return;
     }
     const char *cstr = env->GetStringUTFChars((jstring) targetPath, nullptr);
+    // the file must exist
     int ret = fanotify_mark(fanotifyFd,
                             FAN_MARK_ADD,
                             FAN_CLOSE | FAN_OPEN | FAN_EVENT_ON_CHILD,

@@ -1,6 +1,7 @@
 package com.fenquen.jfsnotify;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,20 +17,28 @@ public class FsNotify {
     private BlockingQueue<Event> eventQueue;
     private String targetPath;
 
-    public FsNotify(BlockingQueue<Event> eventQueue, String targetPath) {
-        File file =  new File(targetPath);
-        if (file.isDirectory()){
-            
-        }
 
-        this.eventQueue = eventQueue;
+    public FsNotify(String targetPath, BlockingQueue<Event> eventQueue) throws FileNotFoundException {
         this.targetPath = targetPath;
+        this.eventQueue = eventQueue;
 
+        init();
     }
 
-    public FsNotify(String targetPath) {
+    public FsNotify(String targetPath) throws FileNotFoundException {
         this.targetPath = targetPath;
         this.eventQueue = new LinkedBlockingQueue<>();
+
+        init();
+    }
+
+    private void init() throws FileNotFoundException {
+        File file = new File(targetPath);
+
+        // targetPath should be existing ,the fanotify_mark will fail which says:No such file or directory
+        if (!file.exists()) {
+            throw new FileNotFoundException(targetPath);
+        }
     }
 
     public void watch() throws Exception {
