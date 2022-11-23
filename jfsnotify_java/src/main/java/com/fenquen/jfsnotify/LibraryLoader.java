@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class LibraryLoader {
+
     private static final String LIBRARY_FILE_NAME = "libjfsnotify.so";
 
     // copy the library  object to some where else
