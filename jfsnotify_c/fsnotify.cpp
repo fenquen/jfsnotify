@@ -21,7 +21,7 @@ extern "C" {
  * Method:    watch0
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, jobject thiz) {
+JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, jobject thiz, jint mask) {
     static jclass fsnotifyClass = env->GetObjectClass(thiz);
 
     // eventQueue
@@ -80,7 +80,7 @@ JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *env, j
     // the file must exist
     int ret = fanotify_mark(fanotifyFd,
                             FAN_MARK_ADD,
-                            FAN_CLOSE | FAN_OPEN | FAN_EVENT_ON_CHILD,
+                            mask,
                             0,
                             cstr);
     env->ReleaseStringUTFChars((jstring) targetPath, cstr);

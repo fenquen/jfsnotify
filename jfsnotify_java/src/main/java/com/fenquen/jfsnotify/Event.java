@@ -90,6 +90,10 @@ public class Event {
      */
     public static final int FAN_OPEN_EXEC_PERM = 0x00040000;
 
+    public static final int FAN_CLOSE = FAN_CLOSE_NOWRITE | FAN_CLOSE_WRITE;
+
+    public static final int FAN_EVENT_ON_CHILD = 0x08000000;
+
     public int type;
 
     public int fd;

@@ -12,14 +12,14 @@ extern "C" {
  * Method:    watch0
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0 (JNIEnv *, jobject);
+JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_watch0(JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_fenquen_jfsnotify_FsNotify
  * Method:    stopWatch0
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0 (JNIEnv *, jobject);
+JNIEXPORT void JNICALL Java_com_fenquen_jfsnotify_FsNotify_stopWatch0(JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }
