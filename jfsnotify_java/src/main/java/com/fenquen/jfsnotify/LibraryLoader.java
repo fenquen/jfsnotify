@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 public class LibraryLoader {
     private static final String LIBRARY_FILE_NAME = "libjfsnotify.so";
 
+    // copy the library  object to some where else
     public static File copyLibraryToTemp() throws Exception {
         try (InputStream inputStream = LibraryLoader.class.getClassLoader().getResourceAsStream(LIBRARY_FILE_NAME)) {
             if (null == inputStream) {
