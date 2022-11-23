@@ -98,7 +98,6 @@ public class FsNotify {
         }).start();
 
 
-        //while (true) {
         Event event = fsNotify.getQueue().take();
         System.out.println(event.type);
         System.out.println(event.fd);
@@ -107,8 +106,6 @@ public class FsNotify {
         System.out.println(event.pidPath);
 
         System.out.println();
-
-        // }
 
         fsNotify.stopWatch();
     }
